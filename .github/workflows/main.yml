@@ -1,0 +1,112 @@
+name: Java CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+
+      - name: Build with Maven
+        run: mvn clean install
+
+      - name: Run tests
+        run: mvn test
+
+      - name: Package JAR file
+        run: mvn package --file ./pom.xml
+      
+      - name: List files in target directory
+        run: ls -R target/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifacts
+          path: target/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to environment
+        run: echo "Deploying to environment"
+        env:
+          environment: production
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: build-artifacts
+          path: target/
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: theonlyrou/devopspipeline-app:latest
+          context: .
+
+      - name: List files in target directory
+        run: ls -R target/
+      
+      - name: Use private key
+        run: | 
+          echo "$EC2_PRIVATE_KEY" > key.pem
+                chmod 600 key.pem
+    # Use the private key in subsequent commands
+    
+      - name: Deploy to EC2 instance
+        run: |
+          ssh -i key.pem ec2-user@3.65.228.116 'bash -s' << 'EOF'
+            # Stop any running application
+            sudo systemctl stop your-application.service
+
+            # Remove previous application files
+            sudo rm -rf /opt/your-application/*
+
+            # Install Docker on the EC2 instance if it's not already installed
+            sudo apt-get update
+            sudo apt-get -y install docker.io
+            
+            # Load the Docker image from the artifact
+            sudo docker load -i target/devopspipeline-app.tar.gz
+
+            # Run the Docker container
+            sudo docker run -d -p 80:8080 theonlyrou/devopspipeline-app:latest
+            
+      - name: Verify deployment
+        run: |
+          # Wait for the application to start up
+          sleep 20
+          
+          # Check if the application is running
+          curl http://3.65.228.116
+          
