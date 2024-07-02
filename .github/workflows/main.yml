@@ -92,7 +92,7 @@ jobs:
 
       - name: Deploy to EC2 instance
         run: |
-          ssh -i key.pem ubuntu@3.65.228.116 'bash -s' -v << 'EOF'
+          sudo ssh -i key.pem ubuntu@3.65.228.116 'bash -s' -v << 'EOF'
             # Stop any running application
             sudo systemctl stop your-application.service
 
