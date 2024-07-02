@@ -92,7 +92,7 @@ jobs:
 
       - name: Deploy to EC2 instance
         run: |
-          sudo ssh -o StrictHostKeyChecking=no -i key.pem -v ubuntu@ec2-3-65-228-116.eu-central-1.compute.amazonaws.com 'bash -s' << 'EOF'
+          sudo ssh -o StrictHostKeyChecking=no -i key.pem -v ubuntu@ec2-3-65-228-116.eu-central-1.compute.amazonaws.com 
             # Stop any running application
             sudo systemctl stop your-application.service
 
