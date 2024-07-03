@@ -91,9 +91,8 @@ jobs:
           ssh-keyscan -H 3.65.228.116 >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2 instance
-        run: |
-          chmod 400 key.pem
-          sudo ssh -o StrictHostKeyChecking=no -i key.pem -v ubuntu@ec2-3-65-228-116.eu-central-1.compute.amazonaws.com 
+        run: |          
+          sudo ssh -i key.pem -v ubuntu@ec2-3-65-228-116.eu-central-1.compute.amazonaws.com 
             # Stop any running application
             sudo systemctl stop your-application.service
 
