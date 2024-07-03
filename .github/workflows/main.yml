@@ -93,8 +93,6 @@ jobs:
       - name: Deploy to EC2 instance
         run: |
           ssh-keyscan -H ec2-3-65-228-116.eu-central-1.compute.amazonaws.com >> ~/.ssh/known_hosts
-          ssh-keyscan -H ec2-3-65-228-116.eu-central-1.compute.amazonaws.com >> ~/.ssh/known_hosts2
-          ssh-keyscan -H ec2-3-65-228-116.eu-central-1.compute.amazonaws.com >>/etc/ssh/ssh_known_hosts2
           sudo ssh -i key.pem -v ubuntu@ec2-3-65-228-116.eu-central-1.compute.amazonaws.com 
             # Stop any running application
             sudo systemctl stop your-application.service
