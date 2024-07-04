@@ -80,7 +80,7 @@ jobs:
       
       - name: Use private key
         run: | 
-          echo "${{ secrets.EC2_PRIV_KEY }}" > key.pem
+          echo "${{ secrets.EC2_KEY_NEW }}" > key.pem
           chmod 600 key.pem
       
       - name: Create SSH directory
