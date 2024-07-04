@@ -92,7 +92,7 @@ jobs:
 
       - name: Deploy to EC2 instance
         run: |
-          ssh -i key.pem -o StrictHostKeyChecking=no -vvv ubuntu@ec2-3-65-228-116.eu-central-1.compute.amazonaws.com << 'EOF'
+          ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@ec2-3-65-228-116.eu-central-1.compute.amazonaws.com << 'EOF'
             # Stop any running application
             sudo docker stop $(sudo docker ps -q --filter ancestor=theonlyrou/devopspipeline-app:latest)
 
